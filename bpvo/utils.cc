@@ -18,14 +18,15 @@
 /*
  * Contributor: halismai@cs.cmu.edu
  */
-
+#ifndef WIN32
 #include <unistd.h> // have this included first
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <execinfo.h>
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <execinfo.h>
 #include <errno.h>
 
 #include <algorithm>
@@ -35,6 +36,7 @@
 #include <thread>
 #include <cstdarg>
 #include <functional>
+#include <cctype>
 
 #include "bpvo/utils.h"
 #include "bpvo/debug.h"
@@ -43,7 +45,7 @@ namespace bpvo {
 
 bool icompare(const std::string& a, const std::string& b)
 {
-  return a.size() == b.size() ? !strncasecmp(a.c_str(), b.c_str(), a.size()) : false;
+  return a.size() == b.size() ? !strcmp(a.c_str(), b.c_str()) : false;
 }
 
 struct NoCaseCmp {
@@ -156,20 +158,20 @@ string Format(const char* fmt, ...)
 string GetBackTrace()
 {
   void* buf[1024];
-  int n = backtrace(buf, 1024);
-  char** strings = backtrace_symbols(buf, n);
-  if(!strings) {
-    perror("backtrace_symbols\n");
+  //int n = backtrace(buf, 1024);
+  //char** strings = backtrace_symbols(buf, n);
+  //if(!strings) {
+    //perror("backtrace_symbols\n");
     return "";
-  }
+  //}
 
-  std::string ret;
-  for(int i = 0; i < n; ++i)
-    ret += (std::string(strings[i]) + "\n");
-
-  free(strings);
-
-  return ret;
+  //std::string ret;
+  //for(int i = 0; i < n; ++i)
+  //  ret += (std::string(strings[i]) + "\n");
+  //
+  //free(strings);
+  //
+  //return ret;
 }
 
 string dateAsString()
@@ -197,31 +199,32 @@ string timeAsString()
 string errno_string()
 {
   char buf[128];
-  strerror_r(errno, buf, 128);
+  //strerror_r(errno, buf, 128);
   return string(buf);
 }
 
 double wallclock()
 {
-  struct timeval tv;
-  if( -1 == gettimeofday( &tv, NULL ) ) {
-    Warn("could not gettimeofday, error: '%s'\n", errno_string().c_str());
-  }
-
-  return static_cast<double>( tv.tv_sec )
-      + static_cast<double>( tv.tv_usec ) / 1.0E6;
+  //struct timeval tv;
+  //if( -1 == gettimeofday( &tv, NULL ) ) {
+  //  Warn("could not gettimeofday, error: '%s'\n", errno_string().c_str());
+  //}
+  //
+  //return static_cast<double>( tv.tv_sec )
+  //    + static_cast<double>( tv.tv_usec ) / 1.0E6;
+    return 0.0;
 }
 
 double cputime()
 {
-  struct rusage ru;
-  if( -1 == getrusage( RUSAGE_SELF, &ru ) ) {
-    Warn("could not cpu usage, error '%s'\n", errno_string().c_str());
-  }
-
-  return static_cast<double>( ru.ru_utime.tv_sec )
-      + static_cast<double>( ru.ru_utime.tv_usec ) / 1.0E6;
-
+ // struct rusage ru;
+ // if( -1 == getrusage( RUSAGE_SELF, &ru ) ) {
+ //   Warn("could not cpu usage, error '%s'\n", errno_string().c_str());
+ // }
+ //
+ // return static_cast<double>( ru.ru_utime.tv_sec )
+ //     + static_cast<double>( ru.ru_utime.tv_usec ) / 1.0E6;
+    return 0.0;
 }
 
 namespace fs {
@@ -262,18 +265,20 @@ bool exists(string path)
 bool is_regular(string path)
 {
   struct stat buf;
-  return (0 == stat(path.c_str(), &buf)) ? S_ISREG(buf.st_mode) : false;
+  return true;// (0 == stat(path.c_str(), &buf)) ? S_ISREG(buf.st_mode) : false;
 }
 
 bool is_dir(string path)
 {
   struct stat buf;
-  return (0 == stat(path.c_str(), &buf)) ? S_ISDIR(buf.st_mode) : false;
+  return true;// (0 == stat(path.c_str(), &buf)) ? S_ISDIR(buf.st_mode) : false;
 }
 
 bool try_make_dir(string dname, int mode = 0777)
 {
-  return (0 == ::mkdir(dname.c_str(), mode));
+    //:DANGER
+    return 1.0f;
+//  return (0 == ::mkdir(dname.c_str(), mode));
 }
 
 string mkdir(string dname, bool try_unique, int max_tries)

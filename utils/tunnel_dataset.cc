@@ -3,13 +3,14 @@
 
 #include <fstream>
 #include <algorithm>
+#include <cctype>
 
 namespace {
 
 static inline void removeWhiteSpace(std::string& s)
 {
   s.erase(std::remove_if(s.begin(), s.end(),
-                 [](char c) { return std::isspace<char>(c, std::locale::classic()); }),
+                 [](char c) { return std::isspace(c); }),
           s.end());
 }
 

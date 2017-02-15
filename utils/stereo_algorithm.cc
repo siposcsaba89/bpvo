@@ -27,16 +27,18 @@ struct StereoAlgorithm::Impl
     if(icompare("SGBM", alg) || icompare("SemiGlobalBlockMatching", alg))
     {
       _algorithm = Algorithm::SemiGlobalBlockMatching;
-      _sgbm = make_unique<cv::StereoSGBM>(
+      _sgbm.reset(cv::StereoSGBM::create(0, 16, 3));
+      _sgbm.reset(cv::StereoSGBM::create(
           cf.get<int>("minDisparity"),
           cf.get<int>("numberOfDisparities"),
           cf.get<int>("SADWindowSize", 3),
           cf.get<int>("P1", 0),
           cf.get<int>("P2", 0),
+          0, 0,
           cf.get<int>("uniquenessRatio", 0),
           cf.get<int>("speckleWindowSize", 0),
           cf.get<int>("speckleRange", 0),
-          (bool) cf.get<int>("fullDP", 0));
+          (bool) cf.get<int>("fullDP", 0)));
     }
     else if(icompare("SGM", alg) || icompare("SemiGlobalMatching", alg))
     {
@@ -53,12 +55,12 @@ struct StereoAlgorithm::Impl
       conf.disparityFactor = cf.get<double>("disparityFactor", 256.0);
       conf.censusWeightFactor = cf.get<double>("censusWeightFactor", 1.0/6.0);
 
-      _sgm_stereo = make_unique<SgmStereo>(conf);
+      _sgm_stereo = std::make_unique<SgmStereo>(conf);
     }
     else if(icompare("RSGM", alg))
     {
       _algorithm = Algorithm::RapidSemiGlobalMatching;
-      _rsgm = make_unique<RSGM>();
+      _rsgm = std::make_unique<RSGM>();
     }
     else if(icompare("BlockMatching", alg) || icompare("BM", alg))
     {
@@ -111,7 +113,7 @@ struct StereoAlgorithm::Impl
           assert(_sgbm);
 
           _dmap_buffer.create(left.size(), CV_16SC1);
-          _sgbm->operator()(left, right, _dmap_buffer);
+          _sgbm->compute(left, right, _dmap_buffer);
 
           _dmap_buffer.convertTo(dmap, CV_32FC1, 1.0 / 16.0, 0.0 );
         } break;
@@ -154,7 +156,7 @@ struct StereoAlgorithm::Impl
 }; // impl
 
 StereoAlgorithm::StereoAlgorithm(const ConfigFile& cf)
-  : _impl(make_unique<Impl>(cf)) {}
+  : _impl(std::make_unique<Impl>(cf)) {}
 
 StereoAlgorithm::StereoAlgorithm(std::string conf_fn)
   : StereoAlgorithm(ConfigFile(conf_fn)) {}

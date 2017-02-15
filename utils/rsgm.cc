@@ -22,7 +22,7 @@ Please use the software provided in this package at your own risk. The executabl
 #if !defined(WITH_GPL_CODE)
 struct RSGM::Impl {};
 
-RSGM::RSGM(Config conf) : _config(conf), _impl(bpvo::make_unique<Impl>()) {}
+RSGM::RSGM(Config conf) : _config(conf), _impl(std::make_unique<Impl>()) {}
 RSGM::~RSGM() {}
 
 void RSGM::compute(const cv::Mat&, const cv::Mat&, cv::Mat&)

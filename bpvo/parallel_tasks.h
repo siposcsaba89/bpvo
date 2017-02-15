@@ -46,7 +46,7 @@ class ParallelTasks
     _pool = make_unique<tbb::task_group>();
     UNUSED(n_tasks);
 #else
-    _pool = make_unique<ThreadPool>(n_tasks);
+    _pool = std::make_unique<ThreadPool>(n_tasks);
 #endif
   }
 

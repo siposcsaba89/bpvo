@@ -33,12 +33,14 @@ class AlignedAllocator : public std::allocator<T>
   typedef typename std::allocator<T>::const_pointer const_pointer;
 
  public:
-  template <typename U>
-  struct rebind { typedef AlignedAllocator<U,Alignment> other; };
-
+  //template <typename U>
+  //struct rebind { typedef AlignedAllocator<U,Alignment> other; };
+  template< class U > struct rebind { typedef AlignedAllocator<U, Alignment> other; };
  public:
   AlignedAllocator() {}
   AlignedAllocator(const AlignedAllocator& o) : std::allocator<T>(o) {}
+  template< class U >
+  AlignedAllocator(const AlignedAllocator<U, Alignment>& other) {};
   ~AlignedAllocator() {}
 
   template <typename U, std::size_t A>
@@ -51,13 +53,27 @@ class AlignedAllocator : public std::allocator<T>
   {
     // TODO some systems might not have posix_memalign
     void* ret = nullptr;
+#ifndef WIN32
+    
+
     if(posix_memalign(&ret, Alignment, n*sizeof(T)))
       throw std::bad_alloc();
-
+#else
+    ret = _aligned_malloc(n * sizeof(T), Alignment);
+    if (!ret)
+        throw std::bad_alloc();
+#endif // !WIN
     return static_cast<pointer>(ret);
   }
 
-  inline void deallocate(pointer ptr, size_type){ std::free(ptr); }
+  inline void deallocate(pointer ptr, size_type)
+  {
+#ifndef WIN32
+      std::free(ptr);
+#else
+      _aligned_free(ptr);
+#endif
+  }
 
 }; // AlignedAllocator
 

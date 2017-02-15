@@ -34,7 +34,7 @@
 #include <atomic>
 #include <thread>
 #include <fstream>
-
+#include <iostream>
 #include <opencv2/highgui/highgui.hpp>
 
 namespace bpvo {
@@ -159,7 +159,7 @@ struct VoApp::Impl
   //
   // maximum depth to use for display/writing to disk
   //
-  float _max_point_depth = 5.0;
+  float _max_point_depth = 45.0;
 
 
   std::vector<float> _iter_time_ms;
@@ -182,7 +182,7 @@ VoApp::Options::Options()
 }
 
 VoApp::VoApp(Options options, std::string conf_fn, UniquePointer<Dataset> dataset)
-    : _impl(make_unique<Impl>(options, conf_fn, std::move(dataset)))
+    : _impl(std::make_unique<Impl>(options, conf_fn, std::move(dataset)))
 {
   Sleep(100); // wait for things to start up
 }
@@ -218,7 +218,7 @@ Impl(Options options, std::string conf_fn, UniquePointer<Dataset> dataset)
   , _params(conf_fn)
   , _vo(dataset.get(), _params)
   , _data_loader_thread(std::move(dataset), _data_buffer)
-  , _viewer(make_unique<Viewer>(_options.viewer_options))
+  , _viewer(std::make_unique<Viewer>(_options.viewer_options))
   , _num_frames_processed(0)
 {
   // parse additional stuff from the config file we could query the classes for
@@ -244,7 +244,7 @@ void VoApp::Impl::run()
   THROW_ERROR_IF(_is_running, "VoApp is already running");
 
   _is_running = true;
-  _vo_thread = make_unique<std::thread>(&VoApp::Impl::mainLoop, this);
+  _vo_thread = std::make_unique<std::thread>(&VoApp::Impl::mainLoop, this);
 }
 
 void VoApp::Impl::stop()
@@ -266,7 +266,14 @@ bool writePointCloud(std::string fn, const PointCloud& pc, float min_weight, flo
     if(pc[i].weight() > min_weight && pc[i].xyzw().z() <= max_depth) {
       auto p = pc[i];
       p.xyzw() = pc.pose() * p.xyzw();
-      pc_out.push_back(p);
+      if (!isnan(p.xyzw().x()) && !isnan(p.xyzw().y()) && !isnan(p.xyzw().z()))
+      {
+          pc_out.push_back(p);
+      }
+      else
+      {
+          std::cout << "nan" << std::endl;
+      }
     }
   }
 

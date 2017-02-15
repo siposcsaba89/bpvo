@@ -25,6 +25,7 @@
 #include <sstream>
 #include <vector>
 #include <fstream>
+#include <cctype>
 
 namespace bpvo {
 

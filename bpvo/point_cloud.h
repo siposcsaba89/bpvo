@@ -55,7 +55,7 @@ class PointWithInfo
   friend std::ostream& operator<<(std::ostream&, const PointWithInfo&);
 
  private:
-  char _pad[32 - (sizeof(_xyzw) + sizeof(_rgba) + sizeof(_w))];
+  char _pad[32 - (sizeof(Point) + sizeof(Color) + sizeof(float))];
 
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW

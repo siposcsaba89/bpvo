@@ -24,6 +24,7 @@
 
 #include <Eigen/Core>
 
+
 #include <memory>
 #include <vector>
 #include <iosfwd>
@@ -39,14 +40,14 @@ SharedPointer = std::shared_ptr<_T>;
 template <typename _T> using
 UniquePointer = std::unique_ptr<_T>;
 
-template <class _T, class ... Args> inline
-UniquePointer<_T> make_unique(Args&& ... args) {
-#if __cplusplus > 201103L
-  return std::make_unique<_T>(std::forward<Args>(args)...);
-#else
-  return UniquePointer<_T>(new _T(std::forward<Args>(args)...));
-#endif
-}
+//template <class _T, class ... Args> inline
+//UniquePointer<_T> make_unique(Args&& ... args) {
+//#if __cplusplus > 201103L
+//  return std::make_unique<_T>(std::forward<Args>(args)...);
+//#else
+//  return UniquePointer<_T>(new _T(std::forward<Args>(args)...));
+//#endif
+//}
 
 template <class _T, class ... Args> inline
 SharedPointer<_T> make_shared(Args&& ... args) {

@@ -95,7 +95,7 @@ VisualOdometry::Impl::
 Impl(const Matrix33& K, float b, ImageSize s, const AlgorithmParameters& p)
   : _params(p)
   , _image_size(s)
-  , _vo_pose(make_unique<VisualOdometryPoseEstimator>(p))
+  , _vo_pose(std::make_unique<VisualOdometryPoseEstimator>(p))
   , _T_kf(Matrix44::Identity())
 {
   if(_params.numPyramidLevels <= 0) {
@@ -104,9 +104,9 @@ Impl(const Matrix33& K, float b, ImageSize s, const AlgorithmParameters& p)
     Info("auto pyramid level set to %d\n", _params.numPyramidLevels);
   }
 
-  _ref_frame = make_unique<VisualOdometryFrame>(K, b, _params);
-  _cur_frame = make_unique<VisualOdometryFrame>(K, b, _params);
-  _prev_frame = make_unique<VisualOdometryFrame>(K, b, _params);
+  _ref_frame = std::make_unique<VisualOdometryFrame>(K, b, _params);
+  _cur_frame = std::make_unique<VisualOdometryFrame>(K, b, _params);
+  _prev_frame = std::make_unique<VisualOdometryFrame>(K, b, _params);
 }
 
 static inline Result FirstFrameResult(int n_levels)
@@ -268,7 +268,7 @@ getPointCloudFromRefFrame() const
   THROW_ERROR_IF( n > weights.size(),
                  Format("size mismatch [%zu != %zu]", points.size(), weights.size()).c_str());
 
-  auto ret = make_unique<PointCloud>(n);
+  auto ret = std::make_unique<PointCloud>(n);
 
   const auto& image = *_ref_frame->imagePointer();
   const auto& warp = _ref_frame->getTemplateDataAtLevel(_params.maxTestLevel)->warp();

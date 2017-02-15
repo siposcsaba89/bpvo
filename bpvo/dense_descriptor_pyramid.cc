@@ -84,7 +84,7 @@ struct DenseDescriptorPyramid::Impl
 }; // DenseDescriptorPyramid::Impl
 
 DenseDescriptorPyramid::DenseDescriptorPyramid(const AlgorithmParameters& p)
-  : _impl(make_unique<Impl>(p)) {}
+  : _impl(std::make_unique<Impl>(p)) {}
 
 DenseDescriptorPyramid::
 DenseDescriptorPyramid(DenseDescriptorPyramid&& o) noexcept

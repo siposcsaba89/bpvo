@@ -8,6 +8,9 @@
 #include <opencv2/core/core.hpp>
 #include <vector>
 
+#define M_PI 3.1415926
+
+
 namespace bpvo {
 
 //

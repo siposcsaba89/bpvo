@@ -17,6 +17,9 @@ cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
 project(bpvo C CXX)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+
 set(BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
@@ -121,19 +124,29 @@ else()
 endif()
 
 # REQUIRED packages
-find_package(OpenCV REQUIRED COMPONENTS core imgproc highgui contrib)
+find_package(OpenCV REQUIRED)
 find_package(Eigen  REQUIRED)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${OpenCV_INCLUDE_DIRS} ${EIGEN_INCLUDE_DIRS})
 
-list(APPEND MY_LIBRARIES ${OpenCV_LIBS})
-list(APPEND MY_LIBRARIES_CORE ${OpenCV_LIBS})
+list(APPEND MY_LIBRARIES ${OpenCV_LIBRARIES})
+list(APPEND MY_LIBRARIES_CORE ${OpenCV_LIBRARIES})
 
-set(Boost_USE_STATIC_LIBS     ON)
-set(Boost_USE_STATIC_RUNTIME  ON)
-set(Boost_USE_MULTITHREAD     ON)
-find_package(Boost 1.59.0 REQUIRED COMPONENTS program_options)
+set(Boost_USE_STATIC_LIBS        ON) # only find static libs
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME    OFF)
+find_package(Boost  1.59.0           # Minimum or EXACT version e.g. 1.36.0
+  REQUIRED
+  COMPONENTS program_options                 # Boost libraries by their canonical name
+) 
+
+add_definitions(-DBOOST_ALL_NO_LIB)
+
+#set(Boost_USE_STATIC_LIBS     ON)
+#set(Boost_USE_STATIC_RUNTIME  ON)
+#set(Boost_USE_MULTITHREAD     ON)
+#find_package(Boost 1.59.0 REQUIRED COMPONENTS program_options)
 add_definitions(-DWITH_BOOST)
 include_directories(${Boost_INCLUDE_DIRS})
 list(APPEND MY_LIBRARIES ${Boost_LIBRARIES})
