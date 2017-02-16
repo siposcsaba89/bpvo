@@ -159,7 +159,7 @@ struct VoApp::Impl
   //
   // maximum depth to use for display/writing to disk
   //
-  float _max_point_depth = 45.0;
+  float _max_point_depth = 15.0;
 
 
   std::vector<float> _iter_time_ms;
